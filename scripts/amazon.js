@@ -25,7 +25,7 @@ products.forEach((product) => {
       </div>
 
       <div class="product-quantity-container">
-        <select>
+        <select class="js-quantity-selector-${product.id}">
           <option selected value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
@@ -41,7 +41,7 @@ products.forEach((product) => {
 
       <div class="product-spacer"></div>
 
-      <div class="added-to-cart">
+      <div class="added-to-cart js-product-${product.id}">
         <img src="images/icons/checkmark.png">
         Added
       </div>
@@ -56,7 +56,7 @@ products.forEach((product) => {
 
   document.querySelectorAll('.js-add-to-cart').forEach((button) => {
     button.addEventListener('click', () => {
-      const productId = button.dataset.poductId;
+      const productId = button.dataset.productId;
       let matchingItem;
 
       cart.forEach((item) => {
@@ -65,21 +65,42 @@ products.forEach((product) => {
         }
       });
 
+      const quantitySelector = document.querySelector(`.js-quantity-selector-${productId}`);
+      const quantity = Number(quantitySelector.value);
+
       if(matchingItem) {
-        matchingItem.quantity++;
+        matchingItem.quantity += quantity;
       } else {
         cart.push({
-          productId: productId,
-          quantity: 1
+          productId,
+          quantity
         });
       }
 
       let cartQuantity = 0;
+
       cart.forEach( (item) => {
         cartQuantity = cartQuantity + item.quantity;
       });
 
       document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+      
+      document.querySelector(`.js-product-${productId}`).classList.add('js-added-product-display');
+
+      const currentTimeout = {};
+      const previousTimeOut = currentTimeout[productId];
+
+      if(previousTimeOut) {
+        clearTimeout(previousTimeOut);
+      }
+
+      const timeoutId = setTimeout(() => {
+        document.querySelector(`.js-product-${productId}`).classList.remove('js-added-product-display');
+        currentTimeout[productId] = timeoutId;
+      }, 2000);
+
+
+
     });
 
   });
